@@ -1,0 +1,19 @@
+ansible_user: "{{ lookup('env', 'ANSIBLE_CREDS_USR') }}"
+ansible_password: "{{ lookup('env', 'ANSIBLE_CREDS_PSW') }}"
+
+ansible_connection: winrm
+ansible_winrm_ca_trust_path: /etc/ssl/certs
+
+ansible_winrm_scheme: http
+
+ansible_winrm_port: 5985
+ 
+krb_dns_lookup_realm: true
+krb_dns_lookup_kdc: true
+krb_ticket_lifetime: 24h
+krb_renew_lifetime: 7d
+krb_forwardable: true
+krb_rdns: false
+krb_realm_name: DEERFIELD.AIM.LOCAL
+krb_kdc_hostname: DEERFIELD.AIM.LOCAL
+krb_admin_hostname: DEERFIELD.AIM.LOCAL

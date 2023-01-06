@@ -1,0 +1,5 @@
+---
+inrulesdk_version: 5.5.1.225
+inrulesdk_path: 'D:\Inrule-sdk'
+inrulesdk_executablepath: 'D:\Inrule-sdk\InRule_5.5.1.225_setup.exe'
+inrulesdk_responsefile: 'D:\Inrule-sdk\InRuleInstallResponses-NonProd.xml'

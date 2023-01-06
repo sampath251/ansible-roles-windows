@@ -1,0 +1,4 @@
+---
+- hosts: ucd7
+  roles:
+    - role: ansible-iiswebapp-rulelink-setup
