@@ -1,0 +1,22 @@
+- name: Remove drs-agent if present
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\drs-agent
+    state: absent
+
+- name: Create a directory
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\drs-agent
+    state: directory
+    
+- name: Download drs-agent from artifacroy
+  win_get_url:
+    url: https://artifacts.aimspecialtyhealth.com/artifactory/devops-ansible-templates/AwsReplicationWindowsInstaller.exe 
+    dest: D:\temp\drs-agent
+
+- name: Install AwsReplicationWindowsInstaller.exe 
+  win_command: cmd.exe /k D:\temp\drs-agent\AwsReplicationWindowsInstaller.exe  --region us-east-2 --aws-access-key-id AKIAWFCG7Y6JL46A7UZX --aws-secret-access-key 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 --no-prompt 
+       
+    
+   

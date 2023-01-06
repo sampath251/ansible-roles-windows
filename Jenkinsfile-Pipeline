@@ -1,0 +1,64 @@
+#!/usr/bin/env groovy
+
+
+pipeline {
+    agent 
+    { 
+        kubernetes 
+        { 
+            cloud 'kubernetes'
+            idleMinutes 7
+			defaultContainer 'java-agent'
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - image: "docker-devops.artifacts.aimspecialtyhealth.com/base-build-linux-agent:1.0.23"
+                name: "jnlp"
+                resources:
+                  limits:
+                    memory: "1Gi"
+                    cpu: "200m"
+                  requests:
+                    memory: "256Mi"
+                    cpu: "100m"
+                tty: true
+                securityContext:
+                  privileged: true
+              - image: "devops.artifacts.aimspecialtyhealth.com/ansible-base-image:1.0.48"
+                name: "java-agent"
+                resources:
+                  limits:
+                    memory: "1Gi"
+                    cpu: "1000m"     
+                  requests:
+                    memory: "256Mi"
+                    cpu: "100m"
+                command:
+                - cat
+                tty: true
+              nodeSelector:
+                kubernetes.io/os: "linux"
+                  '''
+        }
+    } 
+	stages 
+    {
+	stage("Build")
+      {
+        steps {
+          script{
+             withCredentials([usernamePassword(credentialsId: 'ANSIBLE_CREDS_ID', usernameVariable: 'ANSIBLE_CREDS_USR', passwordVariable: 'ANSIBLE_CREDS_PSW')])
+            {
+              sh'''
+					ansible-playbook --extra-vars ./ansible/group_vars/osd -i ./ansible/osd ./ansible/ansible-batch-servers-2019.yml -vvv
+               '''
+            }
+            
+               }
+        }
+      }
+	}
+	
+		}	

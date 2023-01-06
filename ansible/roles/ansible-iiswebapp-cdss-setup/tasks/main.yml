@@ -1,0 +1,107 @@
+- name: Remove 2019-server if present
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\2019-ansible-server-setup
+    state: absent
+
+- name: Create a directory
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\2019-ansible-server-setup
+    state: directory
+    
+- name: Download 2019 server packages
+  win_get_url:
+    url: https://artifacts.aimspecialtyhealth.com/artifactory/devops-ansible-templates/ansible-2019-serversetup.zip
+    dest: D:\temp\2019-ansible-server-setup
+    
+- name: Unzip the 2019 server dependencies
+  tags: Unzip
+  win_shell: Expand-Archive -LiteralPath D:\temp\2019-ansible-server-setup\ansible-2019-serversetup.zip -DestinationPath D:\temp\2019-ansible-server-setup
+  
+- name: Remove ansible-2019-serversetup.zip
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\2019-ansible-server-setup\ansible-2019-serversetup.zip
+    state: absent
+  
+- name: Creating RootSitesDir using the ps1 file
+  win_shell: D:\temp\2019-ansible-server-setup\CreateRootDirs\Create-RootSitesDir.ps1
+
+  
+- name: Add-ToAdminGroup using the ps1 file
+  win_shell: D:\temp\2019-ansible-server-setup\UpdateAdminGroup\Add-ToAdminGroup.ps1  
+  
+# - name: Creating EnableOpenSSH using the ps1 file
+  # win_shell: D:\temp\2019-ansible-server-setup\EnableOpenSSH\Enable-OpenSSH.ps1
+  
+- name: Ensure Strong Encryption is enabled
+  win_regedit:
+    path: HKLM:\SOFTWARE\Microsoft\.NETFramework\v4.0.30319
+    name: SchUseStrongCrypto
+    data: 1
+    type: dword
+    
+# - name: Install sybase15 version
+  # win_command: D:\temp\Sybase_SDK1570121\setup.exe /quiet /acceptEula
+    # # dest: C:\Sybase
+- name: Download Dotnetcore3.1_setup.exe
+  win_get_url:
+    url: https://artifacts.aimspecialtyhealth.com/artifactory/chocolatey-install/dotnet-hosting-3.1.5-win.exe
+    dest: D:\2019-server
+    
+- name: Install dotnet-hosting-3.1.5-win.exe
+  win_command: cmd.exe /k D:\dotnet-hosting-3.1.5-win.exe /quiet /acceptEula      
+    
+- name: Remove vcredist_x64 if present
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\vcredist_x64.exe
+    state: absent    
+
+- name: Copy step-1 sybase1.6 version
+  win_shell: Copy-Item -Path D:\temp\2019-ansible-server-setup\Sybase_v16_ODBC\Step-1_C++_2013-x64/* -Destination D:\temp\ -Recurse -force  
+
+    
+- name: Install step-1 sybase1.6 version
+  win_command: D:\temp\vcredist_x64.exe  /quiet /acceptEula
+     
+# - name: Install step-2 sybase1.6 version
+  # win_command: D:\temp\2019-ansible-server-setup\Sybase_v16_ODBC\Step-2_ODBC_v16_x64\ebf29215\setup.exe /quiet /acceptEula /response=D:\temp\2019-ansible-server-setup\Sybase_v16_ODBC\Step-2_ODBC_v16_x64\ebf29215\sample_response
+  # become: yes
+  # become_method: runas
+  # become_user: Administrator
+- name: Remove SQLServer_64-bit_ODBC_Driver if present
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\msodbcsql.msi
+    state: absent 
+    
+- name: Copy SQLServer_64-bit_ODBC_Driver
+  win_shell: Copy-Item -Path D:\temp\2019-ansible-server-setup\SQLServer_64-bit_ODBC_Driver-11_v2014.120.5543.11/* -Destination D:\temp\ -Recurse -force   
+  
+- name: Ensure ODBC_Driver-11_v2014.120.5543.11 is installed via win_command
+  win_command: C:\Windows\System32\msiexec.exe /i "D:\temp\msodbcsql.msi" 
+  ignore_errors: true  
+  
+- name: Run pin to taskbar
+  win_command: cmd.exe /k D:\temp\PintToTaskbar.vbs
+  
+#- name: Create inrule-sdk directory
+  # win_file:
+    # path: "{{ inrulesdk_path }}"
+    # state: directory
+
+# - name: Download InRule_5.5.1.225_setup.exe
+  # win_get_url:
+    # url: https://artifacts.aimspecialtyhealth.com/artifactory/chocolatey-install/InRule_5.5.1.225_setup.exe
+    # dest: "{{ inrulesdk_path }}"
+    
+# - name: Download InRuleInstallResponses-NonProd.xml
+  # win_get_url:
+    # url: https://artifacts.aimspecialtyhealth.com/artifactory/chocolatey-install/InRuleInstallResponses-NonProd.xml
+    # dest: "{{ inrulesdk_path }}"
+
+# - name: Install InRule_5.5.1.225_setup.exe
+  # win_command: cmd.exe /k {{ inrulesdk_executablepath }} /quiet /acceptEula /response={{ inrulesdk_responsefile }}
+    

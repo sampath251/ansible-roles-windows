@@ -1,0 +1,28 @@
+- name: Check if a dotnet runtime service is installed
+  win_stat:
+    path: C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\3.1.9
+  register: folder_info
+  ignore_errors: true
+- debug:
+    msg: Dotnet runtime latest version is already Exists.
+  when: folder_info.stat.exists == true
+- meta: end_play
+  when: folder_info.stat.exists == true
+    
+- name: Obtain information about dotnet version
+  win_command: cmd.exe /k  "dotnet --list-runtimes"
+  register: dotnetruntime
+- name: Print dotnet runtime version
+  debug:
+    msg: "dotnet runtime version already installed : {{ dotnetruntime.stdout }}"
+   
+- name: dotnet hosting runtime
+  win_command: cmd.exe /k  "C:\asp\aspnetcore-runtime-3.1.9-win-x64.exe  /install /acceptEula /quiet"
+  
+- name: Obtain information about dotnet runtime folder
+  win_stat:
+    path: C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\3.1.9
+  register: folder_info
+   
+- name: Check the dotnet runtime version
+  win_command: cmd.exe /k  "dotnet --list-runtimes"

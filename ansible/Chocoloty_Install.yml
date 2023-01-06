@@ -1,0 +1,4 @@
+---
+- hosts: inrule_sdk
+  roles:
+    - role: common

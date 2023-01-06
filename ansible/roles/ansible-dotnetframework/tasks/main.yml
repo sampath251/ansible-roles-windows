@@ -1,0 +1,20 @@
+- name: Remove .NET Framework_4.7.2 if present
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\.NET Framework_4.7.2
+    state: absent
+
+- name: Create a directory
+  tags: EXTRACTION_Directory
+  win_file:
+    path: D:\temp\.NET Framework_4.7.2
+    state: directory
+    
+- name: Download 2019 server packages
+  win_get_url:
+    url: https://artifacts.aimspecialtyhealth.com:443/artifactory/devops-ansible-templates/NDP472-KB4054530-x86-x64-AllOS-ENU.exe
+    dest: D:\temp\.NET Framework_4.7.2
+    
+- name: Install NDP472-KB4054530-x86-x64-AllOS-ENU.exe
+  win_command: cmd.exe /k D:\temp\.NET Framework_4.7.2\NDP472-KB4054530-x86-x64-AllOS-ENU.exe /quiet /acceptEula     
+    
